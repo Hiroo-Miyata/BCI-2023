@@ -36,7 +36,7 @@ normPosition = cellfun(@cumsum,normOutputs,'UniformOutput',0);
 %Raw output plot
 figure;
 subplot(2,1,1)
-title('Raw Output')
+sgtitle('Raw Output')
 plot(rawOutputs{1},'b')
 ylabel('Velocity')
 subplot(2,1,2)
@@ -46,7 +46,7 @@ ylabel('Position')
 %Normalized output plot
 figure;
 subplot(2,1,1)
-title('Normalized Output')
+sgtitle('Normalized Output')
 plot(normOutputs{1},'b')
 ylabel('Velocity')
 subplot(2,1,2)
@@ -54,6 +54,14 @@ plot(normPosition{1},'g')
 ylabel('Position')
 
 %% Part 6: Evaluation
+figure;
+numOfTrials = length(signal);
+for i = 1:numOfTrials
+    subplot(numOfTrials,1,i)
+    plot(rawPosition{i},'g')
+    ylabel(strcat('Trial ',num2str(i),' Position'))
+end
+
 
 figure;
 numOfTrials = length(signal);

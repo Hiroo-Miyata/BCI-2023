@@ -17,12 +17,12 @@ end
 %% Part 2: 
 
 %Get electrode numbers from labels
-c3LaplacianLabels = ["FC3", "C1", "C5", "CP3"];                                            %The labels of electrodes in the Laplcaian filter for C3 (use lowercase letters after the first: Fcz)
+c3LaplacianLabels = ["Fc3", "C1", "C5", "Cp3"];                                            %The labels of electrodes in the Laplcaian filter for C3 (use lowercase letters after the first: Fcz)
 c3LaplacianNumbers = [];
 for label = c3LaplacianLabels
     c3LaplacianNumbers(end+1) = find(strcmp(labels,label));                  %Find the corresponding electrode number in 'labels'
 end
-c4LaplacianLabels = ["FC4", "C2", "C6", "CP4"];
+c4LaplacianLabels = ["Fc4", "C2", "C6", "Cp4"];
 c4LaplacianNumbers = [];
 for label = c4LaplacianLabels
     c4LaplacianNumbers(end+1) = find(strcmp(labels,label));

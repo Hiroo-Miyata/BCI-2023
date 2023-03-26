@@ -54,7 +54,7 @@ c4 = find(ismember(labels, "C4"));
 % from the channel of interest. Apply a small Laplacian filter to C3 and C4 using the channels you identified
 % in Part 2a by subtracting the average of the four Laplacian channels from the channel of interest.
 function [filteredSignal] = laplacianFiltering(signal, surroundingElectrodes, channel)
-    filteredSignal = squeeze(signal(:. channel, :));
+    filteredSignal = squeeze(signal(:, channel, :));
     for i = 1:size(signal,1)
         filteredSignal(i,:) = squeeze(signal(i,channel,:) - mean(signal(i,surroundingElectrodes,:),2));
     end
