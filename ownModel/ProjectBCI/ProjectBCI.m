@@ -33,6 +33,23 @@ artifact removal
 convert to frequency
 %}
 
+%% check the impedance of the electrodes
+signal = runData{1}.trials{1};
+maxV = zeros(size(signal, 1), 1);
+for i = 1:size(signal, 1)
+    maxV(i) = max(abs(signal(i, :)));
+end
+LaplacianLabels = ["C3", "Fc3", "C1", "C5", "Cp3", "F3", "Fc5", "C7", "Cp5", "P3", "Cp1", "Cz", "Fc1", ...
+                    "C4", "Fc4", "C2", "Cp4", "C6", "F4", "Fc2", "Cz", "Cp2", "P4", "Cp6", "C8", "Fc6"];                                        %The labels of electrodes in the Laplcaian filter for C3 (use lowercase letters after the first: Fcz)
+LaplacianNumbers = [];
+for label = LaplacianLabels
+    LaplacianNumbers(end+1) = find(strcmp(labels,label));                  %Find the corresponding electrode number in 'labels'
+end
+figure;
+plot(LaplacianNumbers, maxV(LaplacianNumbers), 'o');
+
+
+
 preprocessed = cell(numRuns, numTrials);
 for k = 1:numRuns
     for j = 1:numTrials
