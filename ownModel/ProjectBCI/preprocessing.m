@@ -17,8 +17,11 @@ function rawOutput = preprocessing(trial,labels,fs, outlierIdx)
     c4 = find(strcmp(labels,'C4'));
     
     % closest laplacian electrodes
-    c3Filt = trial(c3,:) - mean(trial(c3LaplacianNumbers,:),1);
-    c4Filt = trial(c4,:) - mean(trial(c4LaplacianNumbers,:),1);
+    % c3Filt = trial(c3,:) - mean(trial(c3LaplacianNumbers,:),1);
+    % c4Filt = trial(c4,:) - mean(trial(c4LaplacianNumbers,:),1);
+
+    c3Filt = trial(c3,:);
+    c4Filt = trial(c4,:);
     
     % far laplacian electrodes
     % c3Filt(end+1,:) = trial(c3,:) - mean(trial(c3LaplacianNumbers2,:),1);
