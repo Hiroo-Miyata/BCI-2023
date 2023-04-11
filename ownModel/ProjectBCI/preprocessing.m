@@ -1,20 +1,7 @@
 %% Linear Classifier Assignment
 
 function rawOutput = preprocessing(trial,labels,fs, outlierIdx)
-    %% Part 1b: Preprocessing
-    
-    %Cut trial into windows
-    windowLength = 160; %Window length in samples
-    windowStride = 40; %How often to update the window in samples
-    numOfWindows = 1+((size(trial,2)-windowLength)/windowStride);               %Calculate number of windows
-    windows = [];                                                               
-    for i = 1:numOfWindows
-        windowStart = windowStride*(i-1) + 1;                                   %The start index of the windows. For 40ms shift this is: (1, 41, 81, etc.)
-        windowEnd = windowStart+windowLength-1;
-        windows(end+1,:,:) = trial(:,windowStart:windowEnd);
-    end
-    
-    %% Part 2: 
+    %% Part 1: 
     
     %Get electrode numbers from labels
     c3LaplacianLabels = ["Fc3", "C1", "C5", "Cp3"];                                     %The labels of electrodes in the Laplcaian filter for C3 (use lowercase letters after the first: Fcz)
@@ -29,42 +16,46 @@ function rawOutput = preprocessing(trial,labels,fs, outlierIdx)
     c3 = find(strcmp(labels,'C3'));
     c4 = find(strcmp(labels,'C4'));
     
-    %Perform spatial filtering
-    c3Filt = [];
-    c4Filt = [];
-    for windowNumber = 1:size(windows,1)
-        currentWindow = squeeze(windows(windowNumber,:,:));
+    % closest laplacian electrodes
+    c3Filt = trial(c3,:) - mean(trial(c3LaplacianNumbers,:),1);
+    c4Filt = trial(c4,:) - mean(trial(c4LaplacianNumbers,:),1);
+    
+    % far laplacian electrodes
+    % c3Filt(end+1,:) = trial(c3,:) - mean(trial(c3LaplacianNumbers2,:),1);
+    % c4Filt(end+1,:) = trial(c4,:) - mean(trial(c4LaplacianNumbers2,:),1);
 
-        % closest laplacian electrodes
-        c3Filt(end+1,:) = currentWindow(c3,:) - mean(currentWindow(c3LaplacianNumbers,:),1);
-        c4Filt(end+1,:) = currentWindow(c4,:) - mean(currentWindow(c4LaplacianNumbers,:),1);
-        
-        % far laplacian electrodes
-        % c3Filt(end+1,:) = currentWindow(c3,:) - mean(currentWindow(c3LaplacianNumbers2,:),1);
-        % c4Filt(end+1,:) = currentWindow(c4,:) - mean(currentWindow(c4LaplacianNumbers2,:),1);
-    end
+    % Define frequency bands
+    delta_band = [1 4];
+    theta_band = [4 8];
+    alpha_band = [8 13];
+    beta_band = [13 30];
+    gamma_band = [30 100];
+    
+    rawOutput = zeros(10, 1);
 
-    c3alpha = [];
-    c4alpha = [];
+    % Calculate power for each frequency band
+    c3_features.delta = bandpower(c3Filt, fs, delta_band);
+    c3_features.theta = bandpower(c3Filt, fs, theta_band);
+    c3_features.alpha = bandpower(c3Filt, fs, alpha_band);
+    c3_features.beta = bandpower(c3Filt, fs, beta_band);
+    c3_features.gamma = bandpower(c3Filt, fs, gamma_band);
 
-    if numOfWindows > 15
-        startIdx = 7;
-    else
-        startIdx = 1;
-    end
-    for windowNumber = startIdx:size(windows)
-        currentC3 = squeeze(c3Filt(windowNumber,:));
-        currentC4 = squeeze(c4Filt(windowNumber,:));
-        %Estimate power spectrum
-        % The online decoder estimated frequencies from 0 to 30 Hz at intervals of every 0.2 Hz
-        [spectrumC3,f] = pburg(currentC3, 16, [0:0.2:30], fs); %Use the Burg method with a 16th order model to estimate the power spectral density (PSD) from 0 to 30 Hz for each window of channels C3 and C4
-        [spectrumC4,f] = pburg(currentC4, 16, [0:0.2:30], fs);
-        %Sum points between 10.5 and 13.5 Hz
-        c3alpha(end+1)=sum(spectrumC3(f>=10.5 & f<=13.5)); %Sum points between 10.5 and 13.5 Hz
-        c4alpha(end+1)=sum(spectrumC4(f>=10.5 & f<=13.5));
-    end
+    c4_features.delta = bandpower(c4Filt, fs, delta_band);
+    c4_features.theta = bandpower(c4Filt, fs, theta_band);
+    c4_features.alpha = bandpower(c4Filt, fs, alpha_band);
+    c4_features.beta = bandpower(c4Filt, fs, beta_band);
+    c4_features.gamma = bandpower(c4Filt, fs, gamma_band);
 
-    rawOutput = sum([c3alpha; c4alpha],2);
+    rawOutput(1) = c3_features.delta;
+    rawOutput(2) = c3_features.theta;
+    rawOutput(3) = c3_features.alpha;
+    rawOutput(4) = c3_features.beta;
+    rawOutput(5) = c3_features.gamma;
+    rawOutput(6) = c4_features.delta;
+    rawOutput(7) = c4_features.theta;
+    rawOutput(8) = c4_features.alpha;
+    rawOutput(9) = c4_features.beta;
+    rawOutput(10) = c4_features.gamma;
 
 end
     

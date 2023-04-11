@@ -50,7 +50,7 @@ for k = 1:numRuns
     for j = 1:numTrials
         trial = runData{k}.trials{j}(LaplacianNumbers,:);
         outlierIdx = findOutliers(trial);
-        preprocessed{k,j} = preprocessing(trial,LaplacianLabels,fs, outlierIdx);
+        preprocessed{k,j} = preprocessing(trial,LaplacianLabels,fs, []);
         % preprocessed{k,j} = preprocessing(trial,labels,fs);
     end 
 end
@@ -73,33 +73,33 @@ for k = 1:numRuns
     end
 end
 
-% make the amount of trial equal in each class
-minIdx = min(size(X1,2), size(X2,2));
-X1 = X1(:, 1:minIdx);
-X2 = X2(:, 1:minIdx);
+% % make the amount of trial equal in each class
+% minIdx = min(size(X1,2), size(X2,2));
+% X1 = X1(:, 1:minIdx);
+% X2 = X2(:, 1:minIdx);
 
-data1 = X1';
-data2 = X2';
-% Plot the generated data and their directions
-subplot(1,2,1);
-scatter(data1(:,1), data1(:,2)); hold on;
-scatter(data2(:,1), data2(:,2)); hold on;
-legend('class 1', 'class 2'); hold off;
-grid on; axis equal;
-title('Before CSP filtering');
-xlabel('Channel 1'); ylabel('Channel 2');
-% CSP
-[W,l,A] = csp(X1,X2);
-X1_CSP = W'*X1;
-X2_CSP = W'*X2;
-% Plot the results
-subplot(1,2,2);
-scatter(X1_CSP(1,:), X1_CSP(2,:)); hold on;
-scatter(X2_CSP(1,:), X2_CSP(2,:)); hold on;
-legend('class 1', 'class 2'); hold off;
-axis equal; grid on;
-title('After CSP filtering');
-xlabel('Channel 1'); ylabel('Channel 2');
+% data1 = X1';
+% data2 = X2';
+% % Plot the generated data and their directions
+% subplot(1,2,1);
+% scatter(data1(:,1), data1(:,2)); hold on;
+% scatter(data2(:,1), data2(:,2)); hold on;
+% legend('class 1', 'class 2'); hold off;
+% grid on; axis equal;
+% title('Before CSP filtering');
+% xlabel('Channel 1'); ylabel('Channel 2');
+% % CSP
+% [W,l,A] = csp(X1,X2);
+% X1_CSP = W'*X1;
+% X2_CSP = W'*X2;
+% % Plot the results
+% subplot(1,2,2);
+% scatter(X1_CSP(1,:), X1_CSP(2,:)); hold on;
+% scatter(X2_CSP(1,:), X2_CSP(2,:)); hold on;
+% legend('class 1', 'class 2'); hold off;
+% axis equal; grid on;
+% title('After CSP filtering');
+% xlabel('Channel 1'); ylabel('Channel 2');
 
 
 %%% Classification %%%
@@ -115,12 +115,12 @@ AI/deep learning
 
 %[svmModel, accuracy] = SVM(data,label)
 
-data = [X1_CSP X2_CSP];
-label = [ones(1,size(X1_CSP,2)) 2*ones(1,size(X2_CSP,2))];
-[svmModel, accuracy] = SVM(data',label');
+% data = [X1_CSP X2_CSP];
+% label = [ones(1,size(X1_CSP,2)) 2*ones(1,size(X2_CSP,2))];
+% [svmModel, accuracy] = SVM(data',label');
 
-disp(mean(onlineCorrect(2,:)));
-disp(mean(accuracy));
+% disp(mean(onlineCorrect(2,:)));
+% disp(mean(accuracy));
 
 data = [X1 X2];
 label = [ones(1,size(X1,2)) 2*ones(1,size(X2,2))];
