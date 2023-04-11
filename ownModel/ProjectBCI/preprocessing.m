@@ -40,7 +40,7 @@ function rawOutput = preprocessing(trial,labels,fs, outlierIdx)
     % Define frequency bands
     % delta_band = [1 4];
     % theta_band = [4 8];
-    alpha_band = [8 13];
+    alpha_band = [10 14];
     % beta_band = [13 30];
     % gamma_band = [30 100];
     
