@@ -47,7 +47,7 @@ function rawOutput = preprocessing(trial,labels,fs, outlierIdx)
     rawOutput = zeros(nelectrodes, 1);
 
     for i = 1:nelectrodes
-        rawOutput(i) = bandpower(signals(i,:), fs, theta_band);
+        rawOutput(i) = bandpower(signals(i,:), fs, alpha_band);
     end
 
     % Calculate power for each frequency band
