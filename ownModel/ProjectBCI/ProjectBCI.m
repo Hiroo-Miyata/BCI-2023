@@ -2,7 +2,7 @@ clear all; close all;
 
 %reading in a folder
 %myFolder = uigetdir();
-load("label.mat")
+load("neuroscanChannelLabels68.mat")
 theFiles = dir(fullfile('./MatData', '*.mat'));%myFolder
 numRuns = length(theFiles);
 numTrials = 25;
