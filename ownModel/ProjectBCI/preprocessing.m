@@ -1,6 +1,6 @@
 %% Linear Classifier Assignment
 
-function rawOutput = preprocessing(trial,labels,fs)
+function rawOutput = preprocessing(trial,labels,fs, outlierIdx)
     %% Part 1b: Preprocessing
     
     %Cut trial into windows
@@ -17,16 +17,15 @@ function rawOutput = preprocessing(trial,labels,fs)
     %% Part 2: 
     
     %Get electrode numbers from labels
-    c3LaplacianLabels = ["Fc3", "C1", "C5", "Cp3"];                                        %The labels of electrodes in the Laplcaian filter for C3 (use lowercase letters after the first: Fcz)
-    c3LaplacianNumbers = [];
-    for label = c3LaplacianLabels
-        c3LaplacianNumbers(end+1) = find(strcmp(labels,label));                  %Find the corresponding electrode number in 'labels'
-    end
+    c3LaplacianLabels = ["Fc3", "C1", "C5", "Cp3"];                                     %The labels of electrodes in the Laplcaian filter for C3 (use lowercase letters after the first: Fcz)
+    c3LaplacianNumbers = getIdxFromLabel(labels, c3LaplacianLabels, outlierIdx);
     c4LaplacianLabels = ["Fc4", "C2", "C6", "Cp4"];
-    c4LaplacianNumbers = [];
-    for label = c4LaplacianLabels
-        c4LaplacianNumbers(end+1) = find(strcmp(labels,label));
-    end
+    c4LaplacianNumbers = getIdxFromLabel(labels, c4LaplacianLabels, outlierIdx);
+    c3LaplacianLabels2 = ["F3", "Fc5", "T7", "Cp5", "P3", "Cp1", "Cz", "Fc1"];
+    c3LaplacianNumbers2 = getIdxFromLabel(labels, c3LaplacianLabels2, outlierIdx);
+    c4LaplacianLabels2 = ["F4", "Fc6", "T8", "Cp6", "P4", "Cp2", "Cz", "Fc2"];
+    c4LaplacianNumbers2 = getIdxFromLabel(labels, c4LaplacianLabels2, outlierIdx);
+
     c3 = find(strcmp(labels,'C3'));
     c4 = find(strcmp(labels,'C4'));
     
@@ -35,13 +34,25 @@ function rawOutput = preprocessing(trial,labels,fs)
     c4Filt = [];
     for windowNumber = 1:size(windows,1)
         currentWindow = squeeze(windows(windowNumber,:,:));
-        c3Filt(end+1,:) = currentWindow(c3,:) - mean(currentWindow(c3LaplacianNumbers,:),1); %C3 - average of Laplacian electrodes. Make sure to take the average across channels, not time
-        c4Filt(end+1,:) = currentWindow(c4,:) - mean(currentWindow(c4LaplacianNumbers,:),1); %C4 - average of Laplacian electrodes
+
+        % closest laplacian electrodes
+        c3Filt(end+1,:) = currentWindow(c3,:) - mean(currentWindow(c3LaplacianNumbers,:),1);
+        c4Filt(end+1,:) = currentWindow(c4,:) - mean(currentWindow(c4LaplacianNumbers,:),1);
+        
+        % far laplacian electrodes
+        % c3Filt(end+1,:) = currentWindow(c3,:) - mean(currentWindow(c3LaplacianNumbers2,:),1);
+        % c4Filt(end+1,:) = currentWindow(c4,:) - mean(currentWindow(c4LaplacianNumbers2,:),1);
     end
 
     c3alpha = [];
     c4alpha = [];
-    for windowNumber = 1:size(windows)
+
+    if numOfWindows > 15
+        startIdx = 7;
+    else
+        startIdx = 1;
+    end
+    for windowNumber = startIdx:size(windows)
         currentC3 = squeeze(c3Filt(windowNumber,:));
         currentC4 = squeeze(c4Filt(windowNumber,:));
         %Estimate power spectrum
