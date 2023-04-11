@@ -123,6 +123,20 @@ AI/deep learning
 % disp(mean(accuracy));
 
 data = [X1 X2];
+% run PCA
+[coeff, score, latent, tsquared, explained, mu] = pca(data');
+% plot the explained variance
+figure;
+plot(cumsum(explained));
+xlabel('Number of Components');
+ylabel('Variance (%)'); %for each component
+
+% choose the number of components
+numComponents = 10;
+% project the data
+data = score(:,1:numComponents);
+data = data';
+
 label = [ones(1,size(X1,2)) 2*ones(1,size(X2,2))];
 [svmModel, accuracy] = SVM(data',label');
 
