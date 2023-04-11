@@ -20,8 +20,8 @@ function rawOutput = preprocessing(trial,labels,fs, outlierIdx)
     % c3Filt = trial(c3,:) - mean(trial(c3LaplacianNumbers,:),1);
     % c4Filt = trial(c4,:) - mean(trial(c4LaplacianNumbers,:),1);
 
-    c3Filt = trial(c3,round(0.1*fs):end);
-    c4Filt = trial(c4,round(0.1*fs):end);
+    c3Filt = trial(c3,round(0.2*fs):end);
+    c4Filt = trial(c4,round(0.2*fs):end);
     
     % far laplacian electrodes
     % c3Filt(end+1,:) = trial(c3,:) - mean(trial(c3LaplacianNumbers2,:),1);
