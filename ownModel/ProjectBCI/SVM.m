@@ -1,7 +1,7 @@
 function [svmModel, accuracy] = SVM(data,label)
 
 
-kfolds = 10;
+kfolds = 5;
 fold_size = floor(length(label)/kfolds);
 
 % shuffle
