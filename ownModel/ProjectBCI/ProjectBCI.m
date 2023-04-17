@@ -1,4 +1,4 @@
-clear all; close all;
+ clear all; close all;
 
 %reading in a folder
 %myFolder = uigetdir();
