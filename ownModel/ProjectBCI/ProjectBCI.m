@@ -1,9 +1,10 @@
- clear all; close all;
+clear all; close all;
 
-%reading in a folder
-%myFolder = uigetdir();
+folders = ["./MatData/S1LR", "./MatData/S1UD"]; % , "./MatData/S2LR", "./MatData/S2UD"
+
+for thefolder = folders
 load("neuroscanChannelLabels68.mat")
-theFiles = dir(fullfile('./MatData', '*.mat'));%myFolder
+theFiles = dir(fullfile(thefolder, '*.mat'));%myFolder
 numRuns = length(theFiles);
 numTrials = 25;
 for k = 1 : length(theFiles)
@@ -32,19 +33,6 @@ for label = LaplacianLabels
     LaplacianNumbers(end+1) = find(strcmp(labels,label));                  %Find the corresponding electrode number in 'labels'
 end
 
-%%% Preprocessing %%%
-%{
-Optional Steps:
-remove unnecessary electrodes
-bandpass filtering
-LaPlacian filtering
-detrend
-artifact removal
-convert to frequency
-%}
-
-
-
 preprocessed = cell(numRuns, numTrials);
 for k = 1:numRuns
     for j = 1:numTrials
@@ -55,11 +43,6 @@ for k = 1:numRuns
     end 
 end
 
-% channels = [1:3 5:64]; %EXCLUDE Channel 4 for run 1 trial 1
-
-
-%%% Feature Extraction %%%
-% common spatial patterns (CSP)
 X1 = [];
 X2 = [];
 for k = 1:numRuns
@@ -73,56 +56,8 @@ for k = 1:numRuns
     end
 end
 
-% % make the amount of trial equal in each class
-% minIdx = min(size(X1,2), size(X2,2));
-% X1 = X1(:, 1:minIdx);
-% X2 = X2(:, 1:minIdx);
-
-% data1 = X1';
-% data2 = X2';
-% % Plot the generated data and their directions
-% subplot(1,2,1);
-% scatter(data1(:,1), data1(:,2)); hold on;
-% scatter(data2(:,1), data2(:,2)); hold on;
-% legend('class 1', 'class 2'); hold off;
-% grid on; axis equal;
-% title('Before CSP filtering');
-% xlabel('Channel 1'); ylabel('Channel 2');
-% % CSP
-% [W,l,A] = csp(X1,X2);
-% X1_CSP = W'*X1;
-% X2_CSP = W'*X2;
-% % Plot the results
-% subplot(1,2,2);
-% scatter(X1_CSP(1,:), X1_CSP(2,:)); hold on;
-% scatter(X2_CSP(1,:), X2_CSP(2,:)); hold on;
-% legend('class 1', 'class 2'); hold off;
-% axis equal; grid on;
-% title('After CSP filtering');
-% xlabel('Channel 1'); ylabel('Channel 2');
-
-
-%%% Classification %%%
-%{
-Classifying Options:
-linear classifier
-support vector machines (SVM)
-linear discriminant analysis (LDA)
-decision trees/random forest
-AdaBoost
-AI/deep learning
-%}
-
-%[svmModel, accuracy] = SVM(data,label)
-
-% data = [X1_CSP X2_CSP];
-% label = [ones(1,size(X1_CSP,2)) 2*ones(1,size(X2_CSP,2))];
-% [svmModel, accuracy] = SVM(data',label');
-
-% disp(mean(onlineCorrect(2,:)));
-% disp(mean(accuracy));
-
 data = [X1 X2];
+data = normalize(data, 1);
 % run PCA
 [coeff, score, latent, tsquared, explained, mu] = pca(data');
 % plot the explained variance
@@ -132,23 +67,26 @@ xlabel('Number of Components');
 ylabel('Variance (%)'); %for each component
 
 % choose the number of components
-numComponents = 10;
+numComponents = 20;
 % project the data
 data = score(:,1:numComponents);
 data = data';
 
 label = [ones(1,size(X1,2)) 2*ones(1,size(X2,2))];
-[svmModel, accuracy] = SVM(data',label');
+
+figure;
+scatter(score(1:size(X1,2), 3), score(1:size(X1,2),4), 10, 'red', 'filled'); hold on;
+scatter(score(size(X1,2)+1:end, 3), score(size(X1,2)+1:end,4), 10, 'blue', 'filled'); hold on;
+legend(["class 1", "class 2"], Location='best'); hold off;
+grid on; axis equal;
+title('after PCA');
+xlabel('PC1'); ylabel('PC2');
+
+% [svmModel, accuracy] = SVM(data',label');
+[accuracy] = SVM_new(data',label');
 
 disp(mean(onlineCorrect(2,:)));
-disp(mean(accuracy));
-%%% Apply Decoder %%%
+disp(max(accuracy(:)));
 
-
-%%% Compare Performance to Online %%%
-
-
-%%% Statistical Comparison of Performances %%%
-
-
+end
 

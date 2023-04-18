@@ -1,7 +1,7 @@
 function [svmModel, accuracy] = SVM(data,label)
 
 
-kfolds = 10;
+kfolds = 5;
 fold_size = floor(length(label)/kfolds);
 
 % shuffle
@@ -23,7 +23,7 @@ for i = 1:kfolds
     Ytrain = shuffledLabel(trainIndex);
     Ytest = shuffledLabel(testIndex);
     
-    svmModel{i} = fitcsvm(Xtrain, Ytrain); %, 'KernelFunction', 'rbf', 'KernelScale', 'auto', 'Standardize', true, 'BoxConstraint', 1, 'ClassNames', [0, 1]);
+    svmModel{i} = fitcsvm(Xtrain, Ytrain, 'KernelFunction', 'rbf'); %, 'KernelFunction', 'rbf', 'KernelScale', 'auto', 'Standardize', true, 'BoxConstraint', 1, 'ClassNames', [0, 1]);
 
     % Predict class labels for testing data
     Ypred = predict(svmModel{i}, Xtest);
